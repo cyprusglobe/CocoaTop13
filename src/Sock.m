@@ -72,7 +72,8 @@ NSString *psGetProcessName(struct extern_proc *ep)
 
 int stack_snapshot(int pid, char *tracebuf, int bufsize, int options)
 {
-	return syscall(SYS_stack_snapshot, pid, tracebuf, bufsize, options);
+	//return syscall(SYS_stack_snapshot, pid, tracebuf, bufsize, options);
+	return 0;
 }
 
 @implementation PSSockThreads

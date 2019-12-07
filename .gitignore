@@ -2,3 +2,6 @@
 /src/obj
 /src/.theos
 /src/theos
+
+.DS_Store
+packages/

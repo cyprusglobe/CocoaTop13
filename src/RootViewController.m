@@ -1,7 +1,6 @@
 #import "Compat.h"
 #import "RootViewController.h"
 #import "SockViewController.h"
-#import "THtmlViewController.h"
 #import "Setup.h"
 #import "SetupColumns.h"
 #import "GridCell.h"
@@ -36,8 +35,6 @@
 	switch (item) {
 	case 0: view = [[SetupViewController alloc] initWithStyle:UITableViewStyleGrouped]; break;
 	case 1: view = [[SetupColsViewController alloc] initWithStyle:UITableViewStyleGrouped]; break;
-	case 2: view = [[HtmlViewController alloc] initWithURL:@"guide" title:@"Quick Guide"]; break;
-	case 3: view = [[HtmlViewController alloc] initWithURL:@"story" title:@"The Story"]; break;
 	}
 	if (view)
 		[self.navigationController pushViewController:view animated:YES];
@@ -49,7 +46,6 @@
 		fullScreen = !self.navigationController.navigationBarHidden;
 		// This "scrolls" tableview so that it doesn't actually move when the bars disappear
 		if (!fullScreen) {			// Show navbar & scrollbar (going out of fullscreen)
-			[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
 			[self.navigationController setNavigationBarHidden:NO animated:NO];
 		}
 		CGSize size = [UIApplication sharedApplication].statusBarFrame.size;
@@ -61,7 +57,6 @@
 		[self.tableView setContentOffset:contentOffset animated:NO];
 		if (fullScreen) {			// Hide navbar & scrollbar (entering fullscreen)
 			[self.navigationController setNavigationBarHidden:YES animated:NO];
-			[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
 		}
 		[self.tableView reloadData];
 //		[timer fire];
@@ -75,7 +70,7 @@
 	bool isPhone = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
 
 //	self.wantsFullScreenLayout = YES;
-	[self popupMenuWithItems:@[@"Settings", @"Columns", @"Quick Guide", @"About"] selected:-1 aligned:UIControlContentHorizontalAlignmentLeft];
+	[self popupMenuWithItems:@[@"Settings", @"Columns"] selected:-1 aligned:UIControlContentHorizontalAlignmentLeft];
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"] style:UIBarButtonItemStylePlain
 		target:self action:@selector(popupMenuToggle)];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
@@ -390,7 +385,10 @@
 	// task_terminate(task)
 	if (kill(proc.pid, sig)) {
 		NSString *msg = [NSString stringWithFormat:@"Error %d while terminating app", errno];
-		[[[UIAlertView alloc] initWithTitle:proc.name message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+		UIAlertController* alertController = [UIAlertController alertControllerWithTitle:proc.name message:msg preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil];
+        [alertController addAction:cancelAction];
+        [self presentViewController:alertController animated:YES completion:nil];
 	}
 	// Refresh immediately to show process termination
 	tableView.editing = NO;
