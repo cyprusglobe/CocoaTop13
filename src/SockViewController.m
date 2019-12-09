@@ -16,7 +16,6 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	PSSockArray *socks;
 	PSColumn *sortColumn;
 	BOOL sortDescending;
-	BOOL fullScreen;
 	CGFloat timerInterval;
 	NSUInteger configId;
 	column_mode_t viewMode;
@@ -52,27 +51,6 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	[self.navigationController popViewControllerAnimated:NO];
 }
 
-- (IBAction)hideShowNavBar:(UIGestureRecognizer *)gestureRecognizer
-{
-	if (!gestureRecognizer || gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-		fullScreen = !self.navigationController.navigationBarHidden;
-		// This "scrolls" tableview so that it doesn't actually move when the bars disappear
-		if (!fullScreen) {			// Show navbar & scrollbar (going out of fullscreen)
-			[self.navigationController setNavigationBarHidden:NO animated:NO];
-		}
-		CGSize size = [UIApplication sharedApplication].statusBarFrame.size;
-		CGFloat slide = MIN(size.width, size.height) +
-			self.navigationController.navigationBar.frame.size.height +
-			([[NSUserDefaults standardUserDefaults] boolForKey:@"ShowHeader"] ? self.tableView.sectionHeaderHeight : 0);
-		CGPoint contentOffset = self.tableView.contentOffset;
-		contentOffset.y += fullScreen ? -slide : slide;
-		[self.tableView setContentOffset:contentOffset animated:NO];
-		if (fullScreen) {			// Hide navbar & scrollbar (entering fullscreen)
-			[self.navigationController setNavigationBarHidden:YES animated:NO];
-		}
-		[timer fire];
-	}
-}
 
 - (void)viewDidLoad
 {
@@ -84,7 +62,7 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	NSMutableArray *modeItems = [NSMutableArray arrayWithObjects:ColumnModeName count:ColumnModes];
 	modeItems[ColumnModeThreads] = [modeItems[ColumnModeThreads] stringByAppendingFormat:@" (%u)", proc.threads];
 	modeItems[ColumnModeFiles  ] = [modeItems[ColumnModeFiles  ] stringByAppendingFormat:@" (%u)", proc.files];
-	modeItems[ColumnModePorts  ] = [modeItems[ColumnModePorts  ] stringByAppendingFormat:@" (%u)", proc.ports];
+//	modeItems[ColumnModePorts  ] = [modeItems[ColumnModePorts  ] stringByAppendingFormat:@" (%u)", proc.ports];
 //	modeItems[ColumnModeModules] = [modeItems[ColumnModeModules] stringByAppendingFormat:@" (%u)", proc.modules];
 	[self popupMenuWithItems:modeItems selected:viewMode aligned:UIControlContentHorizontalAlignmentRight];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"] style:UIBarButtonItemStylePlain
@@ -92,14 +70,10 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 	[self.tableView setSeparatorInset:UIEdgeInsetsZero];
 #endif
-	UITapGestureRecognizer *twoTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShowNavBar:)];
-	twoTap.numberOfTouchesRequired = 2;
-	[self.tableView addGestureRecognizer:twoTap];
 
 	self.tableView.sectionHeaderHeight = self.tableView.sectionHeaderHeight * 3 / 2;
 	fullRowHeight = self.tableView.rowHeight;
 	configId = 0;
-	fullScreen = NO;
 }
 
 - (void)refreshSocks:(NSTimer *)_timer
@@ -222,10 +196,10 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 
 // Section header/footer will be used as a grid header/footer
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{ return !fullScreen ? header : nil; }
+{ return header; }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{ return !fullScreen ? self.tableView.sectionHeaderHeight : 0; }
+{ return self.tableView.sectionHeaderHeight; }
 
 // Data is acquired from PSProcArray
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -241,7 +215,7 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	GridTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[GridTableCell reuseIdWithIcon:NO]];
 	if (cell == nil)
 		cell = [GridTableCell cellWithIcon:NO];
-	[cell configureWithId:configId columns:columns size:CGSizeMake(0, tableView.rowHeight)];
+	[cell configureWithId:configId columns:columns];
 	if (sock)
 		[cell updateWithSock:sock columns:columns];
 	return cell;
@@ -272,8 +246,8 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 		   *message = (viewMode == ColumnModeSummary) ? [NSString stringWithFormat:@"%@\n\n%@", sock.col.getData(sock.proc),
 		   [sock.col.descr substringWithRange:NSMakeRange(0, [sock.col.descr lineRangeForRange:NSMakeRange(0,1)].length-1)]] :
 					  (viewMode == ColumnModeModules) ? sock.name : sock.description;
-	if (viewMode == ColumnModePorts)
-		message = [[message stringByReplacingOccurrencesOfString:@" <" withString:@"\n<"] stringByReplacingOccurrencesOfString:@" >" withString:@"\n>"];
+//	if (viewMode == ColumnModePorts)
+//		message = [[message stringByReplacingOccurrencesOfString:@" <" withString:@"\n<"] stringByReplacingOccurrencesOfString:@" >" withString:@"\n>"];
 	UIAlertController* alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil];
     [alertController addAction:cancelAction];

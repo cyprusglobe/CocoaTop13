@@ -58,7 +58,7 @@
 	}
 	// Show/hide animation
 	CGRect menuFrame = menuView.frame;
-	menuFrame.origin.y = willAppear ? 0.0 : -menuFrame.size.height;
+	menuFrame.origin.y = willAppear ? 92.0 : -menuFrame.size.height;
 	CGFloat menuTintAlpha = willAppear ? 0.7 : 0.0;
 	void (^animations)(void) = ^ {
 		menuView.frame = menuFrame;
@@ -105,7 +105,7 @@
 	const CGFloat buttonHeight = 45.0;
 	const CGFloat menuHeight = items.count * (1.0 + buttonHeight);
 
-	menuView = [[UIView alloc] initWithFrame:CGRectMake(0.0, -menuHeight, 0.0, menuHeight)];
+	menuView = [[UIView alloc] initWithFrame:CGRectMake(0.0, menuHeight, 0.0, menuHeight)];
 	menuView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	menuView.backgroundColor = [UIColor colorWithWhite:0.85 alpha:1.0];
 	self.popupMenuSelected = sel;

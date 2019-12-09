@@ -14,15 +14,14 @@
 {
 	GridHeaderView *header;
 	GridHeaderView *footer;
+    UILabel *statusLabel;
 	UISearchBar *filter;
 	PSProcArray *procs;
 	NSTimer *timer;
-	UILabel *statusLabel;
 	NSArray *columns;
 	PSColumn *sortColumn;
 	PSColumn *filterColumn;
 	BOOL sortDescending;
-	BOOL fullScreen;
 	CGFloat timerInterval;
 	NSUInteger configId;
 	NSString *configChange;
@@ -33,34 +32,12 @@
 {
 	UIViewController* view = nil;
 	switch (item) {
-	case 0: view = [[SetupViewController alloc] initWithStyle:UITableViewStyleGrouped]; break;
-	case 1: view = [[SetupColsViewController alloc] initWithStyle:UITableViewStyleGrouped]; break;
+        case 0: view = [[SetupViewController alloc] initWithStyle:UITableViewStyleGrouped]; break;
+        case 1: view = [[SetupColsViewController alloc] initWithStyle:UITableViewStyleGrouped]; break;
 	}
-	if (view)
+    if (view) {
 		[self.navigationController pushViewController:view animated:YES];
-}
-
-- (IBAction)hideShowNavBar:(UIGestureRecognizer *)gestureRecognizer
-{
-	if (!gestureRecognizer || gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-		fullScreen = !self.navigationController.navigationBarHidden;
-		// This "scrolls" tableview so that it doesn't actually move when the bars disappear
-		if (!fullScreen) {			// Show navbar & scrollbar (going out of fullscreen)
-			[self.navigationController setNavigationBarHidden:NO animated:NO];
-		}
-		CGSize size = [UIApplication sharedApplication].statusBarFrame.size;
-		CGFloat slide = MIN(size.width, size.height) +
-			self.navigationController.navigationBar.frame.size.height +
-			([[NSUserDefaults standardUserDefaults] boolForKey:@"ShowHeader"] ? self.tableView.sectionHeaderHeight : 0);
-		CGPoint contentOffset = self.tableView.contentOffset;
-		contentOffset.y += fullScreen ? -slide : slide;
-		[self.tableView setContentOffset:contentOffset animated:NO];
-		if (fullScreen) {			// Hide navbar & scrollbar (entering fullscreen)
-			[self.navigationController setNavigationBarHidden:YES animated:NO];
-		}
-		[self.tableView reloadData];
-//		[timer fire];
-	}
+    }
 }
 
 - (void)viewDidLoad
@@ -70,18 +47,20 @@
 	bool isPhone = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
 
 //	self.wantsFullScreenLayout = YES;
+//    [self setEdgesForExtendedLayout:UIRectEdgeNone];
 	[self popupMenuWithItems:@[@"Settings", @"Columns"] selected:-1 aligned:UIControlContentHorizontalAlignmentLeft];
-	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"] style:UIBarButtonItemStylePlain
-		target:self action:@selector(popupMenuToggle)];
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-		target:self action:@selector(refreshProcs:)];
+	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"]
+                                             style:UIBarButtonItemStylePlain
+                                             target:self
+                                             action:@selector(popupMenuToggle)];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                              initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                              target:self
+                                              action:@selector(refreshProcs:)];
 	statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - (isPhone ? 80 : 150), 40)];
 	statusLabel.backgroundColor = [UIColor clearColor];
 	self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, [[UIBarButtonItem alloc] initWithCustomView:statusLabel]];
-
-	UITapGestureRecognizer *twoTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShowNavBar:)];
-	twoTap.numberOfTouchesRequired = 2;
-	[self.tableView addGestureRecognizer:twoTap];
 
 	filter = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 0)];
 	filter.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -94,7 +73,8 @@
 	[filter sizeToFit];  
 	self.tableView.tableHeaderView = filter;
 
-	self.tableView.sectionHeaderHeight = self.tableView.sectionHeaderHeight * 3 / 2;
+	self.tableView.sectionHeaderHeight = 24;
+    self.tableView.sectionFooterHeight = 24;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 	[self.tableView setSeparatorInset:UIEdgeInsetsZero];
 #endif
@@ -119,7 +99,6 @@
 	configChange = @"";
 	configId = 0;
 	selectedPid = -1;
-	fullScreen = NO;
 }
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)filterText
@@ -327,17 +306,24 @@
 #pragma mark Table view data source
 
 // Section header/footer will be used as a grid header/footer
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{ return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowHeader"] && !fullScreen ? header : nil; }
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowHeader"] ? header : nil;
+}
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
-{ return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowFooter"] && !fullScreen ? footer : nil; }
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowFooter"] ? footer : nil;
+}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{ return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowHeader"] && !fullScreen ? self.tableView.sectionHeaderHeight : 0; }
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowHeader"] ? self.tableView.sectionHeaderHeight : 0;
+}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-{ return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowFooter"] && !fullScreen ? self.tableView.sectionFooterHeight : 0; }
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowFooter"] ? self.tableView.sectionFooterHeight : 0;
+}
 
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -359,7 +345,7 @@
 	GridTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[GridTableCell reuseIdWithIcon:proc.icon != nil]];
 	if (cell == nil)
 		cell = [GridTableCell cellWithIcon:proc.icon != nil];
-	[cell configureWithId:configId columns:columns size:CGSizeMake(0, tableView.rowHeight)];
+	[cell configureWithId:configId columns:columns];
 	if (proc)
 		[cell updateWithProc:proc columns:columns];
 	return cell;
@@ -428,9 +414,6 @@
 #endif
 	if (filter.isFirstResponder)
 		[filter resignFirstResponder];
-	// Return from fullscreen, or there's no way back ;)
-	if (fullScreen)
-		[self hideShowNavBar:nil];
 	PSProc *proc = procs[indexPath.row];
 	selectedPid = proc.pid;
 	[self.navigationController pushViewController:[[SockViewController alloc] initWithProc:proc] animated:anim];

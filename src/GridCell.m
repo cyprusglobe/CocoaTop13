@@ -80,8 +80,10 @@
 	return [[GridTableCell alloc] initWithIcon:withicon];
 }
 
-- (void)configureWithId:(int)id columns:(NSArray *)columns size:(CGSize)size
+- (void)configureWithId:(int)id columns:(NSArray *)columns
 {
+    CGSize size = CGSizeMake(0, 0);
+    size.height = self.contentView.frame.size.height;
 	// Configuration did not change
 	if (self.id == id)
 		return;
@@ -91,20 +93,21 @@
 	if (self.dividers)
 		for (UIView *item in self.dividers) [item removeFromSuperview];
 	// Create new views
-	self.labels = [NSMutableArray arrayWithCapacity:columns.count-1];
+	self.labels = [NSMutableArray arrayWithCapacity:columns.count - 1];
 	self.dividers = [NSMutableArray arrayWithCapacity:columns.count];
 	self.extendArgsLabel = [[NSUserDefaults standardUserDefaults] boolForKey:@"FullWidthCommandLine"];
 	self.colorDiffs = [[NSUserDefaults standardUserDefaults] boolForKey:@"ColorDiffs"];
-	self.textLabel.font = size.height > 40 ? [UIFont systemFontOfSize:18.0] : [UIFont systemFontOfSize:12.0];
+	self.textLabel.font = size.height > 40 ? [UIFont systemFontOfSize:14.0] : [UIFont systemFontOfSize:12.0];
 	if (size.height > 40 && self.extendArgsLabel)
 		size.height /= 2;
 	NSUInteger totalCol;
 	for (PSColumn *col in columns)
 		if (col == columns[0]) {
-			self.firstColWidth = totalCol = col.width - 5;
+			self.firstColWidth = totalCol = col.width - 4;
 			self.textLabel.adjustsFontSizeToFitWidth = !(col.style & ColumnStyleEllipsis);
 			if (col.style & ColumnStylePath) {
-				if (!(col.style & ColumnStyleTooLong)) self.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
+				if (!(col.style & ColumnStyleTooLong))
+                    self.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
 				self.detailTextLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
 			}
 		} else {
@@ -123,7 +126,8 @@
 			label.textAlignment = col.align;
 			label.font = col.style & ColumnStyleMonoFont ? [UIFont fontWithName:@"Courier" size:13.0] : [UIFont systemFontOfSize:12.0];
 			label.adjustsFontSizeToFitWidth = !(col.style & ColumnStyleEllipsis);
-			if (col.style & ColumnStylePath) label.lineBreakMode = NSLineBreakByTruncatingMiddle;
+			if (col.style & ColumnStylePath)
+                label.lineBreakMode = NSLineBreakByTruncatingMiddle;
 			label.backgroundColor = [UIColor clearColor];
 			label.tag = col.tag + 1;
 			[self.labels addObject:label];
@@ -190,22 +194,26 @@
 	CGRect frame;
 	NSInteger imageWidth = self.imageView.frame.size.width;
 	frame = self.contentView.frame;
-		frame.origin.x = 5;
-		frame.size.width -= 10;
+		frame.origin.x = 2;
+		frame.size.width -= 4;
 		self.contentView.frame = frame;
 	frame = self.imageView.frame;
 		frame.origin.x = 0;
 		self.imageView.frame = frame;
 	frame = self.textLabel.frame;
 		frame.origin.x = imageWidth;
-		if (frame.origin.x) frame.origin.x += 5;
-		frame.size.width = self.firstColWidth - imageWidth - 5;
+		if (frame.origin.x)
+            frame.origin.x += 2;
+		frame.size.width = self.firstColWidth - imageWidth - 4;
 		self.textLabel.frame = frame;
 	frame = self.detailTextLabel.frame;
 		frame.origin.x = imageWidth;
-		if (frame.origin.x) frame.origin.x += 5;
-		if (!self.extendArgsLabel) frame.size.width = self.firstColWidth - imageWidth - 5;
-			else frame.size.width = self.contentView.frame.size.width - imageWidth;
+		if (frame.origin.x)
+            frame.origin.x += 2;
+		if (!self.extendArgsLabel)
+            frame.size.width = self.firstColWidth - imageWidth - 4;
+        else
+            frame.size.width = self.contentView.frame.size.width - imageWidth;
 		self.detailTextLabel.frame = frame;
 }
 
@@ -236,9 +244,9 @@
 		UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(totalCol + 2, 0, col.width - 4, size.height)];
 		[self.labels addObject:label];
 		label.textAlignment = footer && col.getSummary ? col.align : NSTextAlignmentCenter;
-		label.font = footer && col != columns[0] ? [UIFont systemFontOfSize:12.0] : [UIFont boldSystemFontOfSize:16.0];
+		label.font = footer && col != columns[0] ? [UIFont systemFontOfSize:12.0] : [UIFont boldSystemFontOfSize:14.0];
 		label.adjustsFontSizeToFitWidth = YES;
-		label.text = footer ? @"-" : col.name;
+		label.text = footer ? @"N/A" : col.name;
 		label.textColor = [UIColor blackColor];
 		label.backgroundColor = [UIColor clearColor];
 		label.tag = col.tag + 1;

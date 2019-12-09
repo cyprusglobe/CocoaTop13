@@ -179,7 +179,7 @@ NSString *psProcessCpuTime(unsigned int ptime)
 			sort:^NSComparisonResult(PSProc *a, PSProc *b) { COMPARE(ppid); } summary:nil
 			descr:@"Unique ID of process' parent - the one that called exec()/fork().\n\n"
 				"On iOS most processes are jobs, thus they are launched by launchd and have parent pid 1."],
-		[PSColumn psColumnWithName:@"%" fullname:@"%CPU Usage" align:NSTextAlignmentRight width:50 tag:3 style:ColumnStyleSortDesc | ColumnStyleColor
+		[PSColumn psColumnWithName:@"%CPU" fullname:@"%CPU Usage" align:NSTextAlignmentRight width:50 tag:3 style:ColumnStyleSortDesc | ColumnStyleColor
 			data:^NSString*(PSProc *proc) { return !proc.pcpu ? @"-" : [NSString stringWithFormat:@"%.1f", (float)proc.pcpu / 10]; }
 			floatData:^double(PSProc *proc) { return (double)proc.pcpu / 10; }
 			sort:^NSComparisonResult(PSProc *a, PSProc *b) { COMPARE(pcpu); }
@@ -580,7 +580,7 @@ NSString *psProcessCpuTime(unsigned int ptime)
 		[PSColumn psColumnWithName:@"TID" fullname:@"Thread ID" align:NSTextAlignmentRight width:53 tag:2000 style:0
 			data:^NSString*(PSSockThreads *sock) { return [NSString stringWithFormat:@"%llX", sock.tid]; }
 			sort:^NSComparisonResult(PSSockThreads *a, PSSockThreads *b) { COMPARE(tid); } summary:nil],
-		[PSColumn psColumnWithName:@"%" fullname:@"%CPU Usage" align:NSTextAlignmentRight width:42 tag:2001 style:ColumnStyleSortDesc
+		[PSColumn psColumnWithName:@"%CPU" fullname:@"%CPU Usage" align:NSTextAlignmentRight width:42 tag:2001 style:ColumnStyleSortDesc
 			data:^NSString*(PSSockThreads *sock) { return !sock->tbi.cpu_usage ? @"-" : [NSString stringWithFormat:@"%.1f", (float)sock->tbi.cpu_usage / 10]; }
 			sort:^NSComparisonResult(PSSockThreads *a, PSSockThreads *b) { COMPARE_VAR(tbi.cpu_usage); } summary:nil],
 		[PSColumn psColumnWithName:@"Time" fullname:@"Thread Time" align:NSTextAlignmentRight width:60 tag:2002 style:ColumnStyleSortDesc | ColumnStyleLowSpace
