@@ -80,7 +80,7 @@
 	return [[GridTableCell alloc] initWithIcon:withicon];
 }
 
-- (void)configureWithId:(int)id columns:(NSArray *)columns
+- (void)configureWithId:(NSUInteger)id columns:(NSArray *)columns
 {
     CGSize size = CGSizeMake(0, 0);
     size.height = self.contentView.frame.size.height;

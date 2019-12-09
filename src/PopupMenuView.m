@@ -44,9 +44,16 @@
 	}
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
-{
-	[self popupMenuLayout];
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+        [self popupMenuLayout];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+
+    }];
+
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
 - (IBAction)popupMenuToggle
@@ -58,7 +65,8 @@
 	}
 	// Show/hide animation
 	CGRect menuFrame = menuView.frame;
-	menuFrame.origin.y = willAppear ? 92.0 : -menuFrame.size.height;
+    // Fuck here 88 temporary
+	menuFrame.origin.y = willAppear ? 88.0 : -menuFrame.size.height;
 	CGFloat menuTintAlpha = willAppear ? 0.7 : 0.0;
 	void (^animations)(void) = ^ {
 		menuView.frame = menuFrame;
@@ -135,7 +143,7 @@
 	[super viewWillDisappear:animated];
 }
 
-- (void)viewDidUnload
+- (void)didReceiveMemoryWarning
 {
 	if (menuContainerView != nil) {
 		[menuContainerView removeFromSuperview];
@@ -143,7 +151,7 @@
 		menuTintView = nil;
 		menuView = nil;
 	}
-	[super viewDidUnload];
+	[super didReceiveMemoryWarning];
 }
 
 @end

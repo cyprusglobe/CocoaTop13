@@ -47,8 +47,9 @@
 	bool isPhone = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
 
 //	self.wantsFullScreenLayout = YES;
-//    [self setEdgesForExtendedLayout:UIRectEdgeNone];
+    
 	[self popupMenuWithItems:@[@"Settings", @"Columns"] selected:-1 aligned:UIControlContentHorizontalAlignmentLeft];
+    
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                              initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"]
                                              style:UIBarButtonItemStylePlain
@@ -73,11 +74,12 @@
 	[filter sizeToFit];  
 	self.tableView.tableHeaderView = filter;
 
-	self.tableView.sectionHeaderHeight = 24;
+    self.tableView.estimatedRowHeight = 0;
+    self.tableView.estimatedSectionHeaderHeight = 0;
+    self.tableView.estimatedSectionFooterHeight = 0;
+    self.tableView.sectionHeaderHeight = 24;
     self.tableView.sectionFooterHeight = 24;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 	[self.tableView setSeparatorInset:UIEdgeInsetsZero];
-#endif
 	[[NSUserDefaults standardUserDefaults] registerDefaults:@{
 		@"Columns" : @[@0, @1, @3, @5, @20, @6, @7, @9, @12, @13],
 		@"UpdateInterval" : @"1",
@@ -151,11 +153,11 @@
 		return;
 	[procs refresh];
 	[procs sortUsingComparator:sortColumn.sort desc:sortDescending];
+    
 	[procs filter:filter.text column:filterColumn];
 	[self.tableView reloadData];
 	[footer updateSummaryWithColumns:columns procs:procs];
 	// Status bar
-// Also add: Uptime, CPU Freq, Cores, Cache L1/L2
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
 		statusLabel.text = [NSString stringWithFormat:@"Free: %.1f MB  CPU: %.1f%%",
 			(float)procs.memFree / 1024 / 1024,
@@ -181,9 +183,6 @@
 		}
 		if (idx != NSNotFound && procs[idx].display != ProcDisplayTerminated) {
 			[self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:idx inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_7_0
-			[self.tableView deselectRowAtIndexPath:[NSIndexPath indexPathForRow:idx inSection:0] animated:YES];
-#endif
 		}
 	} else if ([[NSUserDefaults standardUserDefaults] boolForKey:@"AutoJumpNewProcess"]) {
 		// If there's a new/terminated process, scroll to it
@@ -285,18 +284,35 @@
 	columns = nil;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-	return interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;
+- (BOOL)shouldAutorotate {
+    return [self.navigationController supportedInterfaceOrientations];
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return [self.navigationController supportedInterfaceOrientations];
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+        UIInterfaceOrientation fromInterfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        [self didRotate:fromInterfaceOrientation];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+
+    }];
+
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (void)didRotate:(UIInterfaceOrientation)fromInterfaceOrientation
 {
+    UIInterfaceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
 	if ((fromInterfaceOrientation == UIInterfaceOrientationPortrait || fromInterfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) &&
-		(self.interfaceOrientation == UIInterfaceOrientationPortrait || self.interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+		(deviceOrientation == UIInterfaceOrientationPortrait || deviceOrientation == UIInterfaceOrientationPortraitUpsideDown))
 		return;
 	if ((fromInterfaceOrientation == UIInterfaceOrientationLandscapeLeft || fromInterfaceOrientation == UIInterfaceOrientationLandscapeRight) &&
-		(self.interfaceOrientation == UIInterfaceOrientationLandscapeLeft || self.interfaceOrientation == UIInterfaceOrientationLandscapeRight))
+		(deviceOrientation == UIInterfaceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight))
 		return;
 	[self columnConfigChanged];
 	[timer fire];
@@ -408,10 +424,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	BOOL anim = NO;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
-	// Shitty bug in iOS 7
-	if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_8_0) anim = YES;
-#endif
 	if (filter.isFirstResponder)
 		[filter resignFirstResponder];
 	PSProc *proc = procs[indexPath.row];
@@ -422,7 +434,7 @@
 #pragma mark -
 #pragma mark Memory management
 
-- (void)viewDidUnload
+- (void)didReceiveMemoryWarning
 {
 	if (timer.isValid)
 		[timer invalidate];
@@ -433,7 +445,7 @@
 	filterColumn = nil;
 	procs = nil;
 	columns = nil;
-	[super viewDidUnload];
+	[super didReceiveMemoryWarning];
 }
 
 - (void)dealloc

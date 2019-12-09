@@ -4,7 +4,7 @@
 #import "Column.h"
 #import "Sock.h"
 
-NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", @"Open ports", @"Modules"};
+NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", @"Modules"};
 
 @implementation SockViewController
 {
@@ -24,6 +24,10 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 
 - (void)popupMenuTappedItem:(NSInteger)item
 {
+    // Skip ports now
+    if (item == 3) {
+        item++;
+    }
 	if (viewMode != item) {
 		// Mode changed - need to reset all information
 		viewMode = self.popupMenuSelected = item;
@@ -41,17 +45,6 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	return self;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-	return interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;
-}
-
-- (IBAction)backWithoutAnimation
-{
-	[self.navigationController popViewControllerAnimated:NO];
-}
-
-
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
@@ -59,19 +52,22 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 		style: UIBarButtonItemStyleDone target:self action:@selector(backWithoutAnimation)];
 
 	viewMode = [[NSUserDefaults standardUserDefaults] integerForKey:@"ProcInfoMode"];
-	NSMutableArray *modeItems = [NSMutableArray arrayWithObjects:ColumnModeName count:ColumnModes];
+	NSMutableArray *modeItems = [NSMutableArray arrayWithObjects:ColumnModeName count:ColumnModes - 1];
 	modeItems[ColumnModeThreads] = [modeItems[ColumnModeThreads] stringByAppendingFormat:@" (%u)", proc.threads];
 	modeItems[ColumnModeFiles  ] = [modeItems[ColumnModeFiles  ] stringByAppendingFormat:@" (%u)", proc.files];
 //	modeItems[ColumnModePorts  ] = [modeItems[ColumnModePorts  ] stringByAppendingFormat:@" (%u)", proc.ports];
 //	modeItems[ColumnModeModules] = [modeItems[ColumnModeModules] stringByAppendingFormat:@" (%u)", proc.modules];
 	[self popupMenuWithItems:modeItems selected:viewMode aligned:UIControlContentHorizontalAlignmentRight];
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"] style:UIBarButtonItemStylePlain
-		target:self action:@selector(popupMenuToggle)];
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                              initWithImage:[UIImage imageNamed:@"UIButtonBarHamburger"]
+                                              style:UIBarButtonItemStylePlain
+                                              target:self
+                                              action:@selector(popupMenuToggle)];
 	[self.tableView setSeparatorInset:UIEdgeInsetsZero];
-#endif
 
-	self.tableView.sectionHeaderHeight = self.tableView.sectionHeaderHeight * 3 / 2;
+	self.tableView.estimatedRowHeight = 0;
+    self.tableView.estimatedSectionHeaderHeight = 0;
+    self.tableView.sectionHeaderHeight = 24;
 	fullRowHeight = self.tableView.rowHeight;
 	configId = 0;
 }
@@ -147,42 +143,65 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	header = [GridHeaderView headerWithColumns:columns size:CGSizeMake(0, self.tableView.sectionHeaderHeight)];
 	[header sortColumnOld:nil New:sortColumn desc:sortDescending];
 	[header addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(sortHeader:)]];
-	self.tableView.rowHeight = viewMode == ColumnModeModules ? fullRowHeight : fullRowHeight * 0.6;
+//	self.tableView.rowHeight = viewMode == ColumnModeModules ? fullRowHeight : fullRowHeight * 0.6;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	[super viewWillAppear:animated];
-	socks = [PSSockArray psSockArrayWithProc:proc];
-	procName = [proc.executable lastPathComponent];
-	[self configureMode];
-	// Refresh interval
-	timerInterval = [[NSUserDefaults standardUserDefaults] floatForKey:@"UpdateInterval"];
-	[self refreshSocks:nil];
+    [super viewWillAppear:animated];
+    socks = [PSSockArray psSockArrayWithProc:proc];
+    procName = [proc.executable lastPathComponent];
+    [self configureMode];
+    // Refresh interval
+    timerInterval = [[NSUserDefaults standardUserDefaults] floatForKey:@"UpdateInterval"];
+    [self refreshSocks:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-	[super viewDidDisappear:animated];
-	if (timer.isValid)
-		[timer invalidate];
-	socks = nil;
-	header = nil;
-	columns = nil;
-	proc = nil;
+    [super viewDidDisappear:animated];
+    if (timer.isValid)
+        [timer invalidate];
+    socks = nil;
+    header = nil;
+    columns = nil;
+    proc = nil;
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+- (BOOL)shouldAutorotate {
+    return [self.navigationController supportedInterfaceOrientations];
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+        UIInterfaceOrientation fromInterfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        [self didRotate:fromInterfaceOrientation];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+
+    }];
+
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (void)didRotate:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-	if ((fromInterfaceOrientation == UIInterfaceOrientationPortrait || fromInterfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) &&
-		(self.interfaceOrientation == UIInterfaceOrientationPortrait || self.interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
-		return;
-	if ((fromInterfaceOrientation == UIInterfaceOrientationLandscapeLeft || fromInterfaceOrientation == UIInterfaceOrientationLandscapeRight) &&
-		(self.interfaceOrientation == UIInterfaceOrientationLandscapeLeft || self.interfaceOrientation == UIInterfaceOrientationLandscapeRight))
-		return;
-	// Size changed - need to redraw
-	[self configureMode];
-	[timer fire];
+    UIInterfaceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if ((fromInterfaceOrientation == UIInterfaceOrientationPortrait || fromInterfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) &&
+        (deviceOrientation == UIInterfaceOrientationPortrait || deviceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+        return;
+    if ((fromInterfaceOrientation == UIInterfaceOrientationLandscapeLeft || fromInterfaceOrientation == UIInterfaceOrientationLandscapeRight) &&
+        (deviceOrientation == UIInterfaceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight))
+        return;
+    // Size changed - need to redraw
+    [self configureMode];
+    [timer fire];
+}
+
+- (IBAction)backWithoutAnimation
+{
+    [self.navigationController popViewControllerAnimated:NO];
 }
 
 #pragma mark -
@@ -257,7 +276,7 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 #pragma mark -
 #pragma mark Memory management
 
-- (void)viewDidUnload
+- (void)didReceiveMemoryWarning
 {
 	// Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
 	if (timer.isValid)
@@ -266,7 +285,7 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	sortColumn = nil;
 	socks = nil;
 	columns = nil;
-	[super viewDidUnload];
+	[super didReceiveMemoryWarning];
 }
 
 - (void)dealloc

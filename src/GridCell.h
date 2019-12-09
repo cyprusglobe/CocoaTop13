@@ -13,7 +13,7 @@
 @property (strong) NSMutableArray *dividers;
 + (NSString *)reuseIdWithIcon:(bool)withicon;
 + (instancetype)cellWithIcon:(bool)withicon;
-- (void)configureWithId:(int)id columns:(NSArray *)columns;
+- (void)configureWithId:(NSUInteger)id columns:(NSArray *)columns;
 - (void)updateWithProc:(PSProc *)proc columns:(NSArray *)columns;
 - (void)updateWithSock:(PSSock *)sock columns:(NSArray *)columns;
 @end
