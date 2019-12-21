@@ -648,7 +648,7 @@ NSString *psProcessCpuTime(unsigned int ptime)
 	PSColumn *extendedcol = nil;
 	NSUInteger width = fullwidth;
 	for (PSColumn *col in cols) {
-		if ((col.style & ColumnStyleLowSpace) && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && fullwidth < 400)
+		if ((col.style & ColumnStyleLowSpace) && [[UIDevice currentDevice] userInterfaceIdiom]  == UIUserInterfaceIdiomPhone && fullwidth < 400)
 			col.width = 0;
 		else
 			col.width = col.minwidth;
@@ -658,7 +658,7 @@ NSString *psProcessCpuTime(unsigned int ptime)
 	}
 	if (extendedcol)
 		extendedcol.width = extendedcol.minwidth + width;
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
 		[cols filterUsingPredicate:[NSPredicate predicateWithBlock: ^BOOL(PSColumn *obj, NSDictionary *bind) {
 			return obj.width != 0;
 		}]];

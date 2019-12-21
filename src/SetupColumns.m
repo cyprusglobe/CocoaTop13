@@ -26,7 +26,7 @@ static NSArray *presetNames;
 	[super viewDidLoad];
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
 			presetList = @{
 				@"1: Standard":@[@0, @1, @3, @5, @20, @6, @7],
 				@"2: Inspector":@[@0, @3, @5, @6, @7, @9, @12],

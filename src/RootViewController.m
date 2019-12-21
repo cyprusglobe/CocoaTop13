@@ -43,8 +43,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	[UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-	bool isPhone = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
+	bool isPhone = [[UIDevice currentDevice] userInterfaceIdiom]  == UIUserInterfaceIdiomPhone;
 
 //	self.wantsFullScreenLayout = YES;
     
@@ -158,7 +157,7 @@
 	[self.tableView reloadData];
 	[footer updateSummaryWithColumns:columns procs:procs];
 	// Status bar
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
 		statusLabel.text = [NSString stringWithFormat:@"Free: %.1f MB  CPU: %.1f%%",
 			(float)procs.memFree / 1024 / 1024,
 			(float)procs.totalCpu / 10];
@@ -295,7 +294,7 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
     {
-        UIInterfaceOrientation fromInterfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        UIInterfaceOrientation fromInterfaceOrientation = [UIApplication sharedApplication].windows[0].windowScene.interfaceOrientation;
         [self didRotate:fromInterfaceOrientation];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
     {
@@ -307,7 +306,7 @@
 
 - (void)didRotate:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    UIInterfaceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    UIInterfaceOrientation deviceOrientation = [UIApplication sharedApplication].windows[0].windowScene.interfaceOrientation;
 	if ((fromInterfaceOrientation == UIInterfaceOrientationPortrait || fromInterfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) &&
 		(deviceOrientation == UIInterfaceOrientationPortrait || deviceOrientation == UIInterfaceOrientationPortraitUpsideDown))
 		return;

@@ -66,7 +66,7 @@
 	navController.modalPresentationStyle = UIModalPresentationFormSheet;
 //	navController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
 	[parent presentViewController:navController animated:NO completion:nil];
-	if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone) {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 		navController.view.superview.layer.cornerRadius = 10.0;
 		navController.view.superview.layer.borderColor = [UIColor clearColor].CGColor;

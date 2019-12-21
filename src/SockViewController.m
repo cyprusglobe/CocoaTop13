@@ -175,7 +175,7 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
     {
-        UIInterfaceOrientation fromInterfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        UIInterfaceOrientation fromInterfaceOrientation = [UIApplication sharedApplication].windows[0].windowScene.interfaceOrientation;
         [self didRotate:fromInterfaceOrientation];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
     {
@@ -187,7 +187,7 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 
 - (void)didRotate:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    UIInterfaceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    UIInterfaceOrientation deviceOrientation = [UIApplication sharedApplication].windows[0].windowScene.interfaceOrientation;
     if ((fromInterfaceOrientation == UIInterfaceOrientationPortrait || fromInterfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) &&
         (deviceOrientation == UIInterfaceOrientationPortrait || deviceOrientation == UIInterfaceOrientationPortraitUpsideDown))
         return;
