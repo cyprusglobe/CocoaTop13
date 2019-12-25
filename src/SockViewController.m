@@ -248,9 +248,21 @@ NSString *ColumnModeName[ColumnModes] = {@"Summary", @"Threads", @"Open files", 
 	else if (display == ProcDisplayStarted)
 		cell.backgroundColor = [UIColor colorWithRed:0.7 green:1 blue:0.7 alpha:1];
 	else if (indexPath.row & 1)
-		cell.backgroundColor = [UIColor colorWithRed:.95 green:.95 blue:.95 alpha:1];
-	else
-		cell.backgroundColor = [UIColor whiteColor];
+        cell.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return [UIColor colorWithRed:.15 green:.15 blue:.15 alpha:1];
+            }else{
+                return [UIColor colorWithRed:.95 green:.95 blue:.95 alpha:1];
+            }
+        }];
+    else
+        cell.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return [UIColor blackColor];
+            }else{
+                return [UIColor whiteColor];
+            }
+        }];
 }
 
 #pragma mark -

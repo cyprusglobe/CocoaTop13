@@ -112,7 +112,7 @@
 			}
 		} else {
 			UIView *divider = [[UIView alloc] initWithFrame:CGRectMake(totalCol, 0, 1, size.height)];
-			divider.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
+			divider.backgroundColor = [UIColor systemGray5Color];
 			[self.dividers addObject:divider];
 			[self.contentView addSubview:divider];
 
@@ -224,19 +224,12 @@
 
 - (instancetype)initWithColumns:(NSArray *)columns size:(CGSize)size footer:(bool)footer
 {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 	self = [super initWithReuseIdentifier:@"Header"];
 	self.backgroundView = ({
 		UIView *view = [[UIView alloc] initWithFrame:self.bounds];
 		view.backgroundColor = [UIColor colorWithWhite:.75 alpha:.85];
 		view;
 	});
-#elif __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
-	self = [super initWithReuseIdentifier:@"Header"];
-#else
-	self = [super initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-	self.backgroundColor = [UIColor colorWithWhite:.75 alpha:.85];
-#endif
 	self.labels = [NSMutableArray arrayWithCapacity:columns.count];
 	self.dividers = [NSMutableArray arrayWithCapacity:columns.count];
 	NSUInteger totalCol = 0;

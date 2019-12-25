@@ -151,7 +151,7 @@ NSString *psProcessCpuTime(unsigned int ptime)
 #define COMPARE(field) return COMPARE_ORDER(a.field, b.field);
 #define COMPARE_VAR(field) return COMPARE_ORDER(a->field, b->field);
 #define COMPARE_DELTA(field1, field2) return COMPARE_ORDER(DELTA(a,field1,field2), DELTA(b,field1,field2));
-#define DIFF_ORDER(a, b) ((a) == (b) ? [UIColor blackColor] : (a) > (b) ? [UIColor colorWithRed:.85 green:.0 blue:.0 alpha:1.0] : [UIColor blueColor])
+#define DIFF_ORDER(a, b) ((a) == (b) ? [UIColor labelColor] : (a) > (b) ? [UIColor colorWithRed:.85 green:.3 blue:.3 alpha:1.0] : [UIColor colorWithRed:.3 green:.3 blue:.85 alpha:1.0])
 #define DIFF(field) return DIFF_ORDER(proc.field, proc.prev.field);
 #define DIFF_VAR(field) return DIFF_ORDER(proc->field, proc.prev->field);
 #define DIFF_DELTA(field1, field2) return DIFF_ORDER(DELTA(proc,field1,field2), DELTA(proc.prev,field1,field2));

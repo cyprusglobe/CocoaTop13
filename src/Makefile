@@ -1,5 +1,6 @@
 ARCHS = arm64
 TARGET = iphone:clang:13.1
+FINALPACKAGE = 1
 APPLICATION_NAME = CocoaTop
 ADDITIONAL_OBJCFLAGS = -fobjc-arc
 CocoaTop_FILES = RootViewController.m SockViewController.m Proc.m ProcArray.m NetArray.m Sock.m Column.m GridCell.m Setup.m SetupColumns.m AppIcon.m TextViewController.m PopupMenuView.m BackButtonHandler.m Compat.m AppDelegate.m main.m
