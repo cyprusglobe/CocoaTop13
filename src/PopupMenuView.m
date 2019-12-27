@@ -75,15 +75,9 @@
 	void (^completion)(BOOL) = ^(BOOL finished) {
 		if (!willAppear) [menuContainerView removeFromSuperview];
 	};
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
-	if (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_7_0)
-		[UIView animateWithDuration:0.4 delay:0.0 usingSpringWithDamping:1.0
-			initialSpringVelocity:4.0 options:UIViewAnimationOptionCurveEaseInOut
-			animations:animations completion:completion];
-	else
-#endif
-		[UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut
-			animations:animations completion:completion];
+    [UIView animateWithDuration:0.4 delay:0.0 usingSpringWithDamping:1.0
+        initialSpringVelocity:4.0 options:UIViewAnimationOptionCurveEaseInOut
+        animations:animations completion:completion];
 }
 
 - (void)popupMenuItemTapped:(UIButton *)sender

@@ -93,7 +93,7 @@
 	if (self.dividers)
 		for (UIView *item in self.dividers) [item removeFromSuperview];
 	// Create new views
-	self.labels = [NSMutableArray arrayWithCapacity:columns.count - 1];
+	self.labels = [NSMutableArray arrayWithCapacity:columns.count];
 	self.dividers = [NSMutableArray arrayWithCapacity:columns.count];
 	self.extendArgsLabel = [[NSUserDefaults standardUserDefaults] boolForKey:@"FullWidthCommandLine"];
 	self.colorDiffs = [[NSUserDefaults standardUserDefaults] boolForKey:@"ColorDiffs"];
@@ -112,7 +112,7 @@
 			}
 		} else {
 			UIView *divider = [[UIView alloc] initWithFrame:CGRectMake(totalCol, 0, 1, size.height)];
-			divider.backgroundColor = [UIColor systemGray5Color];
+			divider.backgroundColor = [UIColor separatorColor];
 			[self.dividers addObject:divider];
 			[self.contentView addSubview:divider];
 
@@ -167,7 +167,7 @@
 
 - (void)updateWithSock:(PSSock *)sock columns:(NSArray *)columns
 {
-	self.detailTextLabel.textColor = [UIColor grayColor];
+	self.detailTextLabel.textColor = [UIColor labelColor];
 	for (PSColumn *col in columns) {
 		UILabel *label;
 		if (col != columns[0])
@@ -243,11 +243,7 @@
 		label.textColor = [UIColor blackColor];
 		label.backgroundColor = [UIColor clearColor];
 		label.tag = col.tag + 1;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
 		[self.contentView addSubview:label];
-#else
-		[self addSubview:label];
-#endif
 		totalCol += col.width;
 	}
 	return self;

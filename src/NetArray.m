@@ -84,21 +84,9 @@ void NetStatCallBack(CFSocketRef s, CFSocketCallBackType callbackType, CFDataRef
 		if ((srcval = self.nstats[@(nmsd->srcref)]))
 			cnt = srcval.countsValue;
 		if (nmsd->provider == NSTAT_PROVIDER_UDP) {
-			if (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_7_0)
-				cnt.pid = ((nstat_udp_descriptor_ios6_9 *)nmsd->data)->epid;
-			else if (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_6_0)
-				cnt.pid = ((nstat_udp_descriptor_ios6_9 *)nmsd->data)->pid;
-			else
-				cnt.pid = ((nstat_udp_descriptor_ios5 *)nmsd->data)->pid;
+			cnt.pid = ((nstat_udp_descriptor_ios6_9 *)nmsd->data)->epid;
 		} else if (nmsd->provider == NSTAT_PROVIDER_TCP) {
-			if (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_8_0)
-				cnt.pid = ((nstat_tcp_descriptor_ios8_9 *)nmsd->data)->epid;
-			else if (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_7_0)
-				cnt.pid = ((nstat_tcp_descriptor_ios6_7 *)nmsd->data)->epid;
-			else if (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_6_0)
-				cnt.pid = ((nstat_tcp_descriptor_ios6_7 *)nmsd->data)->pid;
-			else
-				cnt.pid = ((nstat_tcp_descriptor_ios5 *)nmsd->data)->pid;
+			cnt.pid = ((nstat_tcp_descriptor_ios8_9 *)nmsd->data)->epid;
 		}
 		if (cnt.pid > 0) {
 			self.nstats[@(nmsd->srcref)] = [NSValue valueWithCounts:cnt];

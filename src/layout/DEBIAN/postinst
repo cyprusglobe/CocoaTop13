@@ -3,5 +3,4 @@
 chown root.wheel /Applications/CocoaTop.app/CocoaTop
 chmod +s /Applications/CocoaTop.app/CocoaTop
 
-sleep 1
 uicache

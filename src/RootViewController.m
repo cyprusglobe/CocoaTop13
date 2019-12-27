@@ -449,13 +449,13 @@
 {
 	if (timer.isValid)
 		[timer invalidate];
-	statusLabel = nil;
-	header = nil;
-	footer = nil;
-	sortColumn = nil;
-	filterColumn = nil;
-	procs = nil;
-	columns = nil;
+//	statusLabel = nil;
+//	header = nil;
+//	footer = nil;
+//	sortColumn = nil;
+//	filterColumn = nil;
+//	procs = nil;
+//	columns = nil;
 	[super didReceiveMemoryWarning];
 }
 

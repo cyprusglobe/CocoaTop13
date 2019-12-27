@@ -35,9 +35,7 @@ static NSArray *presetNames;
 				@"5: Mach-obsessed":@[@0, @3, @12, @13, @15, @14, @21, @22],
 				@"6: RAM usage":@[@0, @1, @7, @23, @24, @8],
 				@"7: Net usage":@[@0, @1, @33, @42, @43, @44, @45],
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 				@"8: Disk usage":@[@0, @1, @25, @26, @27, @28],
-#endif
 			};
 		else
 			presetList = @{
@@ -48,9 +46,7 @@ static NSArray *presetNames;
 				@"5: Mach-obsessed":@[@0, @1, @5, @6, @7, @3, @12, @16, @13, @15, @14, @21, @22],
 				@"6: RAM usage":@[@0, @1, @3, @5, @7, @23, @24, @8],
 				@"7: Net usage":@[@0, @1, @3, @5, @33, @42, @43, @44, @45, @46, @47],
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 				@"8: Disk usage":@[@0, @1, @9, @25, @26, @27, @28, @24],
-#endif
 			};
 		presetNames = [presetList.allKeys sortedArrayUsingSelector:@selector(compare:)];
 	});

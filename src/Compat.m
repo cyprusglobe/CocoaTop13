@@ -1,42 +1,9 @@
 #import "Compat.h"
 #import <mach/mach_time.h>
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_6_0
-
-@implementation NSArray(Subscripts)
-- (id)objectAtIndexedSubscript:(NSUInteger)idx { return [self objectAtIndex:idx]; }
-@end
-
-@implementation NSMutableArray(Subscripts)
-- (void)setObject:(id)obj atIndexedSubscript:(NSUInteger)idx { [self replaceObjectAtIndex:idx withObject:obj]; }
-@end
-
-@implementation NSDictionary(Subscripts)
-- (id)objectForKeyedSubscript:(id)key { return [self objectForKey:key]; }
-@end
-
-@implementation NSMutableDictionary(Subscripts)
-- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key { [self setObject:obj forKey:key]; }
-@end
-
-@implementation NSByteCountFormatter
-+ (NSString *)stringFromByteCount:(long long)byteCount countStyle:(int)countStyle
-{
-	if (byteCount < 1024)
-		return [NSString stringWithFormat:@"%lld bytes", byteCount];
-	else if (byteCount < 1024 * 1024)
-		return [NSString stringWithFormat:@"%.1f KB", (float)byteCount / 1024];
-	else if (byteCount < 1024 * 1024 * 1024)
-		return [NSString stringWithFormat:@"%.1f MB", (float)byteCount / 1024 / 1024];
-	else
-		return [NSString stringWithFormat:@"%.1f GB", (float)byteCount / 1024 / 1024 / 1024];
-}
-@end
-
-#endif
-
 uint64_t mach_time_to_milliseconds(uint64_t mach_time)
 {
+    // Here should be issued.
 	static mach_timebase_info_data_t timebase = {0};
 	if (!timebase.denom)
 		mach_timebase_info(&timebase);

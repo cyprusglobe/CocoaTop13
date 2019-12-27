@@ -1,7 +1,8 @@
 Package: ru.domo.cocoatop
 Name: CocoaTop
-Version: 2.1.0
+Version: 2.1.1
 Architecture: iphoneos-arm
+Depends: firmware (>= 13.0)
 Description: Process Viewer for iOS GUI
 Maintainer: Fionera
 Author: Domo

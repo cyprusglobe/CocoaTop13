@@ -187,7 +187,7 @@ void dump(unsigned char *b, int s)
 			case TH_STATE_WAITING:			sock.color = sock->tbi.suspend_count ? [UIColor blueColor] : [UIColor blackColor]; break;
 			case TH_STATE_STOPPED:
 			case TH_STATE_HALTED:			sock.color = [UIColor brownColor]; break;
-			default:						sock.color = [UIColor grayColor];
+			default:						sock.color = [UIColor systemGrayColor];
 			}
 			// Get thread name
 			sock.name = @"-";
@@ -214,11 +214,7 @@ void dump(unsigned char *b, int s)
 					} else {
 						// This is a super-hacky hack which works on all 32 bit iOSes!
 						if (mach_vm_read_overwrite(task, addr, sizeof(buf), (mach_vm_address_t)buf, &size) == KERN_SUCCESS) {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_6_0
-							uint64_t addr = (uint64_t)dispatch_queue_get_label((dispatch_queue_t)buf);
-#else
 							uint64_t addr = (uint64_t)dispatch_queue_get_label((__bridge dispatch_queue_t)(void *)buf);
-#endif
 							// addr=buf+0x38 on iOS5
 							if (addr > (uint64_t)buf && addr < (uint64_t)buf + sizeof(buf))
 								dispQueue = [NSString stringWithUTF8String:(char *)addr];
@@ -596,7 +592,6 @@ void dump(unsigned char *b, int s)
 + (NSMutableDictionary *)getLaunchdPortNames
 {
 	NSMutableDictionary *knownPorts = nil;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
 	int hpipe[2];
 	pipe(hpipe);
 	xpc_object_t xpc_out = 0, xpc_in = xpc_dictionary_create(0, 0, 0);
@@ -640,7 +635,6 @@ void dump(unsigned char *b, int s)
 	xpc_release(xp);
 	close(hpipe[0]);
 	close(hpipe[1]);
-#endif
 	return knownPorts;
 }
 

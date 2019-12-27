@@ -137,11 +137,11 @@ NSString *psProcessUptime(uint64_t uptime, uint64_t exittime)
 				: [NSString stringWithFormat:@"%llu:%02llu:%02llu", uptime/60/60, (uptime/60) % 60, uptime % 60];
 }
 
-NSString *psProcessCpuTime(unsigned int ptime)
+NSString *psProcessCpuTime(uint64_t ptime)
 {
-	unsigned int hours = ptime/100/60/60;
-	return hours ? [NSString stringWithFormat:@"%u:%02u:%02u.%02u", hours, (ptime / 6000) % 60, (ptime / 100) % 60, ptime % 100]
-				 : [NSString stringWithFormat:@"%u:%02u.%02u", ptime / 6000, (ptime / 100) % 60, ptime % 100];
+	uint64_t hours = ptime / 100 / 60 / 60;
+	return hours ? [NSString stringWithFormat:@"%llu:%02llu:%02llu.%02llu", hours, (ptime / 6000) % 60, (ptime / 100) % 60, ptime % 100]
+				 : [NSString stringWithFormat:@"%llu:%02llu.%02llu", ptime / 6000, (ptime / 100) % 60, ptime % 100];
 }
 
 @implementation PSColumn
@@ -189,7 +189,7 @@ NSString *psProcessCpuTime(unsigned int ptime)
 				"CPU usage is expressed in % per CPU core, thus it sums up to cores\u00D7100%. "
 				"Sometimes it can even exceed this value, due to reasons explained in this app's 'About' section. This is hilarious!\n\n"
 				"Summary of this column indicates total CPU usage."],
-		[PSColumn psColumnWithName:@"Time" fullname:@"Process Time" align:NSTextAlignmentRight width:75 tag:4 style:ColumnStyleSortDesc | ColumnStyleColor
+		[PSColumn psColumnWithName:@"Time" fullname:@"Process Time" align:NSTextAlignmentLeft width:75 tag:4 style:ColumnStyleSortDesc | ColumnStyleColor
 			data:^NSString*(PSProc *proc) { return psProcessCpuTime(proc.ptime); } floatData:^double(PSProc *proc) { return proc.ptime/100; }
 			sort:^NSComparisonResult(PSProc *a, PSProc *b) { COMPARE(ptime); }
 			summary:^NSString*(PSProcArray* procs) { return psSystemUptime(); }
@@ -461,7 +461,6 @@ NSString *psProcessCpuTime(unsigned int ptime)
 			descr:@"Network packets transmitted by process since launch.\n\n"
 				"This value is inaccurate due to the fact that CocoaTop can only monitor process' sockets "
 				"while it is active. Sockets having a lifetime during CocoaTop being inactive are not counted."],
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 		[PSColumn psColumnWithName:@"WInt" fullname:@"Interrupt Wakeups (Delta)" align:NSTextAlignmentRight width:52 tag:49 style:ColumnStyleSortDesc | ColumnStyleColor
 			data:^NSString*(PSProc *proc) { return [NSString stringWithFormat:@"%llu", DELTA(proc,power,task_interrupt_wakeups)]; }
 			floatData:^double(PSProc *proc) { return DELTA(proc,power,task_interrupt_wakeups); }
@@ -531,7 +530,6 @@ NSString *psProcessCpuTime(unsigned int ptime)
 			sort:^NSComparisonResult(PSProc *a, PSProc *b) { COMPARE_VAR(rusage.ri_proc_start_abstime); } summary:nil
 			color:^UIColor*(PSProc *proc) { DIFF_VAR(rusage.ri_proc_start_abstime); }
 			descr:@"Time elapsed since process launch."],
-#endif
 //		[PSColumn psColumnWithName:@"More" fullname:@"More Data" align:NSTextAlignmentLeft width:170 tag:9999 style:0
 //			data:^NSString*(PSProc *proc) { return proc.moredata; }
 //			sort:^NSComparisonResult(PSProc *a, PSProc *b) { return [a.moredata caseInsensitiveCompare:b.moredata]; } summary:nil],
