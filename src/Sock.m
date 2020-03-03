@@ -182,9 +182,9 @@ void dump(unsigned char *b, int s)
 			sock.ptime = (tbi.system_time.seconds + tbi.user_time.seconds) * 100 + (tbi.system_time.microseconds + tbi.user_time.microseconds + 5000) / 10000;
 			sock.prio = mach_thread_priority(thread_list[j], tbi.policy);
 			switch (sock->tbi.run_state) {
-			case TH_STATE_RUNNING:			sock.color = [UIColor redColor]; break;
-			case TH_STATE_UNINTERRUPTIBLE:	sock.color = [UIColor orangeColor]; break;
-			case TH_STATE_WAITING:			sock.color = sock->tbi.suspend_count ? [UIColor blueColor] : [UIColor blackColor]; break;
+			case TH_STATE_RUNNING:			sock.color = [UIColor systemRedColor]; break;
+			case TH_STATE_UNINTERRUPTIBLE:	sock.color = [UIColor systemOrangeColor]; break;
+			case TH_STATE_WAITING:			sock.color = sock->tbi.suspend_count ? [UIColor systemBlueColor] : [UIColor labelColor]; break;
 			case TH_STATE_STOPPED:
 			case TH_STATE_HALTED:			sock.color = [UIColor brownColor]; break;
 			default:						sock.color = [UIColor systemGrayColor];
@@ -247,7 +247,7 @@ void dump(unsigned char *b, int s)
 {
 	pid_t pid = socks.proc.pid;
 	NSMutableString *name = nil;
-	UIColor *color = [UIColor blackColor];
+	UIColor *color = [UIColor labelColor];
 	uint32_t flags = 0;
 	uint64_t node = 0;
 	char *stype = nil;
@@ -274,7 +274,7 @@ void dump(unsigned char *b, int s)
 		if (info.pipeinfo.pipe_status & PIPE_DRAIN)			[name appendString:@" DRAIN"];
 		if (info.pipeinfo.pipe_status & PIPE_DEAD)			[name appendString:@" DEAD"];
 		stype = "PIPE";
-		color = [UIColor blueColor];
+		color = [UIColor systemBlueColor];
 		flags = info.pfi.fi_openflags;
 		node = info.pipeinfo.pipe_handle;
 	} else if (type == PROX_FDTYPE_KQUEUE) {
@@ -287,7 +287,7 @@ void dump(unsigned char *b, int s)
 		if (info.kqueueinfo.kq_state & PROC_KQUEUE_QOS)		[name appendString:@" QOS"];
 		if (!(info.kqueueinfo.kq_state & ~(PROC_KQUEUE_32 | PROC_KQUEUE_64))) [name appendString:@" SUSPENDED"];
 		stype = "QUEUE";
-		color = [UIColor grayColor];
+		color = [UIColor systemGrayColor];
 		flags = info.pfi.fi_openflags;
 		node = info.kqueueinfo.kq_state;
 	} else if (type == PROX_FDTYPE_SOCKET) {
@@ -348,7 +348,7 @@ void dump(unsigned char *b, int s)
 		case SOCKINFO_KERN_CTL:
 			name = [NSMutableString stringWithFormat:@"KEXT: %s", info.psi.soi_proto.pri_kern_ctl.kcsi_name];
 			stype = "KCTL";
-			color = [UIColor orangeColor];
+			color = [UIColor systemOrangeColor];
 			break;
 		case SOCKINFO_KERN_EVENT: {
 			struct kern_event_info *ki = &info.psi.soi_proto.pri_kern_event;
@@ -392,7 +392,7 @@ void dump(unsigned char *b, int s)
 			}
 			name = [NSMutableString stringWithFormat:@"%@:%@:%@", kvendor, kclass, ksubcls];
 			stype = "KEVNT";
-			color = [UIColor redColor];
+			color = [UIColor systemRedColor];
 			break; }
 		}
 		flags = info.pfi.fi_openflags;
@@ -677,7 +677,7 @@ const char *port_types[] = {"","(thread)","(task)","(host)","(host priv)","(proc
 			if (members)
 				vm_deallocate(mach_task_self(), (vm_address_t)members, memberCount * sizeof(*members));
 		} else
-		self.color = pset ? [UIColor orangeColor] : send && recv ? [UIColor colorWithRed:.0 green:.5 blue:.0 alpha:1.0] : recv ? [UIColor blueColor] : [UIColor blackColor];
+		self.color = pset ? [UIColor systemOrangeColor] : send && recv ? [UIColor colorWithRed:.0 green:.5 blue:.0 alpha:1.0] : recv ? [UIColor systemBlueColor] : [UIColor labelColor];
 	}
 	return self;
 }
@@ -756,7 +756,7 @@ const char *port_types[] = {"","(thread)","(task)","(host)","(host priv)","(proc
 		self.ref = rwpi->prp_prinfo.pri_ref_count;
 		self.dev = rwpi->prp_vip.vip_vi.vi_stat.vst_dev;
 		self.ino = rwpi->prp_vip.vip_vi.vi_stat.vst_ino;
-		self.color = self.dev && self.ino ? [UIColor blackColor] : [UIColor grayColor];
+		self.color = self.dev && self.ino ? [UIColor labelColor] : [UIColor systemGrayColor];
 	}
 	return self;
 }
@@ -775,7 +775,7 @@ const char *port_types[] = {"","(thread)","(task)","(host)","(host priv)","(proc
 		self.size = [dict[@"OSBundleLoadSize"] longLongValue];
 		self.ref = [dict[@"OSBundleRetainCount"] longValue];
 //		self.dev = [dict[@"OSBundleLoadTag"] longValue];
-		self.color = self.name ? [UIColor blackColor] : [UIColor grayColor];
+		self.color = self.name ? [UIColor labelColor] : [UIColor systemGrayColor];
 		self.bundle = dict[@"CFBundleIdentifier"];
 		if (!self.name) self.name = self.bundle;
 	}
