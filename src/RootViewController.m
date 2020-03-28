@@ -265,9 +265,9 @@
 	}
 	[self columnConfigChanged];
 	// Hide filter bar
-	CGFloat minOffset = filter.frame.size.height - self.tableView.contentInset.top;
-	if (self.tableView.contentOffset.y < minOffset)
-		self.tableView.contentOffset = CGPointMake(0, minOffset);
+//    CGFloat minOffset = filter.frame.size.height - self.tableView.contentInset.top;
+//    if (self.tableView.contentOffset.y < minOffset)
+//		self.tableView.contentOffset = CGPointMake(0, minOffset);
 	// Refresh interval
 	timerInterval = [[NSUserDefaults standardUserDefaults] floatForKey:@"UpdateInterval"];
 	[self refreshProcs:nil];
