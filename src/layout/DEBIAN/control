@@ -4,6 +4,7 @@ Version: 2.1.3
 Architecture: iphoneos-arm
 Depends: firmware (>= 13.0)
 Description: Process Viewer for iOS GUI
-Maintainer: Fionera
-Author: Domo
+       Updated for iOS 13 by Fionera
+Maintainer: CRKatri
+Author: Domo and Fionera
 Section: Utilities
